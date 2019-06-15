@@ -22,7 +22,7 @@ syslibdir = /lib
 occlum = yes
 
 ifeq ($(occlum),yes)
-SRC_DIRS = $(addprefix $(srcdir)/,src/* crt occlum_stub)
+SRC_DIRS = $(addprefix $(srcdir)/,src/* crt ldso occlum_stub)
 BASE_GLOBS = $(addsuffix /*.c,$(SRC_DIRS))
 ARCH_GLOBS = $(addsuffix /$(ARCH)/*.[csS],$(SRC_DIRS))
 OCCLUM_GLOBS = $(addsuffix /occlum/*.[csS],$(SRC_DIRS))
@@ -94,7 +94,7 @@ CRT_LIBS = $(addprefix lib/,$(notdir $(CRT_OBJS)))
 STATIC_LIBS = lib/libc.a
 ifeq ($(occlum),yes)
 STUB_LIBS = lib/libocclum_stub.so
-SHARED_LIBS =
+SHARED_LIBS = lib/libc.so
 else
 STUB_LIBS =
 SHARED_LIBS = lib/libc.so
@@ -212,6 +212,7 @@ obj/%.lo: $(srcdir)/%.c $(GENH) $(IMPH)
 
 lib/libc.so: $(LOBJS) $(LDSO_OBJS)
 	$(CC) $(CFLAGS_ALL) $(LDFLAGS_ALL) -nostdlib -shared \
+	-locclum_stub -Llib/ \
 	-Wl,-e,_dlstart -o $@ $(LOBJS) $(LDSO_OBJS) $(LIBCC)
 
 lib/libc.a: $(AOBJS)
