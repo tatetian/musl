@@ -29,8 +29,12 @@ long __syscall_cp_c(syscall_arg_t nr,
 	if ((st=(self=__pthread_self())->canceldisable)
 	    && (st==PTHREAD_CANCEL_DISABLE || nr==SYS_close))
 		return __syscall(nr, u, v, w, x, y, z);
-
+#ifndef __OCCLUM
 	r = __syscall_cp_asm(&self->cancel, nr, u, v, w, x, y, z);
+#else
+	// Occlum note: workaround __syscall_cp for now
+	r = __syscall(nr, u, v, w, x, y, z);
+#endif
 	if (r==-EINTR && nr!=SYS_close && self->cancel &&
 	    self->canceldisable != PTHREAD_CANCEL_DISABLE)
 		r = __cancel();
